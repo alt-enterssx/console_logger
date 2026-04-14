@@ -29,14 +29,25 @@ queueing, formatting, and printing messages in a separate thread.
 
 ---
 
-## 🛠️ Installation
+## 📦 Integration
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/alt-enterssx/console_logger.git
-cd console_logger
-mkdir build && cd build
-cmake ..
-make
+```
+### 2. Add to your project (CMake)
+
+```cmake
+add_subdirectory(console_logger)
+
+target_link_libraries(your_project PRIVATE altenter::console_logger)
+```
+
+### 3. Include header
+
+```cpp
+#include "altenter/console_logger.h"
 ```
 
 ## ⚙️ How It Works
