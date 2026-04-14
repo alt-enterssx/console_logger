@@ -6,6 +6,11 @@
 #include <time.h>
 #include <sstream>
 #include <iomanip>
+#include <queue>
+#include <mutex>
+#include <thread>
+#include <atomic>
+#include <condition_variable>
 
 #define WARNING_COLOR "\033[1;30;43m"
 #define DEBUG_COLOR "\033[1;30;105m"
@@ -33,14 +38,30 @@ namespace altenter {
         CRITICAL
     };
 
+    struct LogMessage {
+        std::string msg;
+        altenter::LogType type;
+
+        LogMessage(std::string&& msg, altenter::LogType type = altenter::LogType::INFO): msg(msg), type(type) {}
+    };
+
     class ConsoleLogger {
         public:
             ConsoleLogger();
             ~ConsoleLogger();
 
-            void log(const std::string&& msg, altenter::LogType type = altenter::LogType::DEBUG);
+            void log(std::string&& msg, altenter::LogType type = altenter::LogType::INFO);
+            
+            private:
+            std::queue<LogMessage> logMessages;
+        
+            std::mutex mtx;
+            std::condition_variable cv;
+            std::thread thrd;
+            std::atomic<bool> run{true};
 
-        private:
+            void process();
+
             std::string getPrefix(altenter::LogType type);
             std::string getTimeInfo();
             char* getColorText(altenter::LogType type);
