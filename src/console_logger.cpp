@@ -1,4 +1,4 @@
-#include "console_logger/console_logger.h"
+#include "altenter/console_logger.h"
 
 altenter::ConsoleLogger::ConsoleLogger() {
     this->thrd = std::thread(&ConsoleLogger::process, this);
