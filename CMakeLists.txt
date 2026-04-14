@@ -3,6 +3,7 @@ set(PROJECT_NAME console_logger)
 
 project(${PROJECT_NAME} LANGUAGES CXX)
 
+
 add_library(${PROJECT_NAME} STATIC src/console_logger.cpp)
 add_library(${PROJECT_NAME}::altenter ALIAS ${PROJECT_NAME})
 
