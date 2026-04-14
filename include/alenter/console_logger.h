@@ -15,8 +15,8 @@
 #define WARNING_COLOR "\033[1;30;43m"
 #define DEBUG_COLOR "\033[1;30;105m"
 #define INFO_COLOR "\033[1;30;102m"
-#define ERROR_COLOR "\033[1;37;101m"
-#define CRITICAL_COLOR "\033[1;37;41m"
+#define ERROR_COLOR "\033[1;97;101m"
+#define CRITICAL_COLOR "\033[1;97;41m"
 
 #define WARNING_COLOR_TEXT "\033[0;33m"
 #define DEBUG_COLOR_TEXT "\033[0;95m"
@@ -24,7 +24,7 @@
 #define ERROR_COLOR_TEXT "\033[0;91m"
 #define CRITICAL_COLOR_TEXT "\033[0;31m"
 
-#define TIME_COLOR "\033[1;37;40m"
+#define TIME_COLOR "\033[1;97;40m"
 
 #define RESET "\033[0m"
 
