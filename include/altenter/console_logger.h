@@ -40,18 +40,46 @@ namespace altenter {
 
     struct LogMessage {
         std::string msg;
-        altenter::LogType type;
+        LogType type;
 
-        LogMessage(std::string&& msg, altenter::LogType type = altenter::LogType::INFO): msg(msg), type(type) {}
+        LogMessage(std::string&& msg, LogType type = LogType::INFO): msg(msg), type(type) {}
     };
 
     class ConsoleLogger {
         public:
             ConsoleLogger();
             ~ConsoleLogger();
+            void shutdown();
 
-            void log(std::string&& msg, altenter::LogType type = altenter::LogType::INFO);
+            void log(std::string&& msg, LogType type = LogType::INFO);
             
+            template<typename... Args>
+            void logFormat(const std::string& msg, LogType type, Args&&... args) {
+                std::vector<std::string> params = {
+                    toString(std::forward<Args>(args))...
+                };
+
+                std::string result;
+                result.reserve(msg.size() + 32);
+
+                size_t argIndex = 0;
+
+                for (size_t i = 0; i < msg.size(); ++i) {
+                    if (msg[i] == '{' && i + 1 < msg.size() && msg[i + 1] == '}') {
+                        if (argIndex < params.size()) {
+                            result += params[argIndex++];
+                        } else {
+                            result += "{}";
+                        }
+                        ++i;
+                    } else {
+                        result += msg[i];
+                    }
+                }
+
+                this->log(std::move(result), type);
+            }
+
             private:
             std::queue<LogMessage> logMessages;
         
@@ -62,9 +90,9 @@ namespace altenter {
 
             void process();
 
-            std::string getPrefix(altenter::LogType type);
+            std::string getPrefix(LogType type);
             std::string getTimeInfo();
-            char* getColorText(altenter::LogType type);
-            char* getColorBg(altenter::LogType type);
+            char* getColorText(LogType type);
+            char* getColorBg(LogType type);
     };
 }

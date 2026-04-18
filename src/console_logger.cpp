@@ -1,10 +1,12 @@
 #include "altenter/console_logger.h"
 
-altenter::ConsoleLogger::ConsoleLogger() {
+using namespace altenter;
+
+ConsoleLogger::ConsoleLogger() {
     this->thrd = std::thread(&ConsoleLogger::process, this);
 }
 
-altenter::ConsoleLogger::~ConsoleLogger() {
+ConsoleLogger::~ConsoleLogger() {
     this->run = false;
     this->cv.notify_all();
     if (this->thrd.joinable()) {
@@ -12,7 +14,15 @@ altenter::ConsoleLogger::~ConsoleLogger() {
     }
 }
 
-void altenter::ConsoleLogger::log(std::string&& msg, LogType type) {
+void ConsoleLogger::shutdown() {
+    this->run = false;
+    this->cv.notify_all();
+    if (this->thrd.joinable()) {
+        this->thrd.join();
+    }
+}
+
+void ConsoleLogger::log(std::string&& msg, LogType type) {
     {
         std::lock_guard<std::mutex> lock(this->mtx);
         this->logMessages.emplace(std::move(msg), type);
@@ -20,7 +30,7 @@ void altenter::ConsoleLogger::log(std::string&& msg, LogType type) {
     this->cv.notify_one();
 }
 
-void altenter::ConsoleLogger::process() {
+void ConsoleLogger::process() {
     while (run || !logMessages.empty()) {
         std::unique_lock<std::mutex> lock(mtx);
 
@@ -46,34 +56,34 @@ void altenter::ConsoleLogger::process() {
     }
 }
 
-std::string altenter::ConsoleLogger::getPrefix(altenter::LogType type) {
+std::string ConsoleLogger::getPrefix(LogType type) {
     std::string combined;
     switch(type) {
-        case altenter::LogType::WARGNING: {
+        case LogType::WARGNING: {
             combined = WARNING_COLOR;
             combined = combined + " | WARNING  ";
 
             break;
         }
-        case altenter::LogType::DEBUG: {
+        case LogType::DEBUG: {
             combined = DEBUG_COLOR;
             combined = combined + " | DEBUG    ";
 
             break;
         }
-        case altenter::LogType::INFO: {
+        case LogType::INFO: {
             combined = INFO_COLOR;
             combined = combined + " | INFO     ";
 
             break;
         }
-        case altenter::LogType::ERROR: {
+        case LogType::ERROR: {
             combined = ERROR_COLOR;
             combined = combined + " | ERROR    ";
 
             break;
         }
-        case altenter::LogType::CRITICAL: {
+        case LogType::CRITICAL: {
             combined = CRITICAL_COLOR;
             combined = combined + " | CRITICAL ";
 
@@ -85,7 +95,7 @@ std::string altenter::ConsoleLogger::getPrefix(altenter::LogType type) {
     return combined;
 }
 
-std::string altenter::ConsoleLogger::getTimeInfo() {
+std::string ConsoleLogger::getTimeInfo() {
     std::time_t t = time(nullptr);
     std::tm* loctime = localtime(&t);
 
@@ -101,42 +111,42 @@ std::string altenter::ConsoleLogger::getTimeInfo() {
     return time_str;
 }
 
-char* altenter::ConsoleLogger::getColorText(altenter::LogType type) {
+char* ConsoleLogger::getColorText(LogType type) {
     switch(type) {
-        case altenter::LogType::WARGNING: {
+        case LogType::WARGNING: {
             return WARNING_COLOR_TEXT;
         }
-        case altenter::LogType::DEBUG: {
+        case LogType::DEBUG: {
             return DEBUG_COLOR_TEXT;
         }
-        case altenter::LogType::INFO: {
+        case LogType::INFO: {
             return INFO_COLOR_TEXT;
         }
-        case altenter::LogType::ERROR: {
+        case LogType::ERROR: {
             return ERROR_COLOR_TEXT;
         }
-        case altenter::LogType::CRITICAL: {
+        case LogType::CRITICAL: {
             return CRITICAL_COLOR_TEXT;
         }
         default: { return ""; }
     }
 }
 
-char* altenter::ConsoleLogger::getColorBg(altenter::LogType type) {
+char* ConsoleLogger::getColorBg(LogType type) {
     switch(type) {
-        case altenter::LogType::WARGNING: {
+        case LogType::WARGNING: {
             return WARNING_COLOR;
         }
-        case altenter::LogType::DEBUG: {
+        case LogType::DEBUG: {
             return DEBUG_COLOR;
         }
-        case altenter::LogType::INFO: {
+        case LogType::INFO: {
             return INFO_COLOR;
         }
-        case altenter::LogType::ERROR: {
+        case LogType::ERROR: {
             return ERROR_COLOR;
         }
-        case altenter::LogType::CRITICAL: {
+        case LogType::CRITICAL: {
             return CRITICAL_COLOR;
         }
         default: { return ""; }
